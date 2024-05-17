@@ -51,7 +51,27 @@ app.delete('/api/persons/:id', (request, response) => {
     persons = persons.filter(person => person.id !== id)
     response.status(204).end()
 })
+
+app.use(express.json())
+
+app.post('/api/persons', (request, response) => {
+    const body = request.body
   
+    if (!body.name || !body.number) {
+        return response.status(400).json({ 
+            error: 'required information missing' 
+        })
+    }
+  
+    const person = {
+        id: Math.floor(Math.random() * Date.now()),
+        name: body.name,
+        number: body.number
+    }
+  
+    persons = persons.concat(person)
+    response.json(person)
+})
 
 const PORT = 3001
 app.listen(PORT, () => {
