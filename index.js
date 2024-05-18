@@ -57,9 +57,17 @@ app.use(express.json())
 app.post('/api/persons', (request, response) => {
     const body = request.body
   
-    if (!body.name || !body.number) {
+    if (!body.name) {
         return response.status(400).json({ 
-            error: 'required information missing' 
+            error: 'The name is missing' 
+        })
+    } else if (!body.number) {
+        return response.status(400).json({ 
+            error: 'The number is missing' 
+        })
+    } else if (persons.filter(x => x.name === body.name).length) {
+        return response.status(400).json({ 
+            error: 'The name already exists in the phonebook' 
         })
     }
   
