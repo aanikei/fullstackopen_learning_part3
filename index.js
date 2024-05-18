@@ -26,7 +26,23 @@ let persons = [
 ]
 
 app.use(express.json())
-app.use(morgan('tiny'))
+morgan.token('body', function (req, res) { 
+    return req.method === "POST" ? JSON.stringify(req.body) : null
+})
+// with - at the end for non-POST, e. g. GET /api/persons/4 200 59 - 4.880 ms -
+// app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
+
+// without - at the end for non-POST, e.g. GET /api/persons/4 200 59 - 3.923 ms
+app.use(morgan(function (tokens, req, res) {
+    return [
+        tokens.method(req, res), " ",
+        tokens.url(req, res), " ",
+        tokens.status(req, res), " ",
+        tokens.res(req, res, 'content-length'), ' - ',
+        tokens['response-time'](req, res), ' ms ',
+        ...(req.method === "POST" ? tokens['body'](req, res) : [])
+    ].join('')
+}))
 
 app.get('/api/persons', (request, response) => {
     response.json(persons)
