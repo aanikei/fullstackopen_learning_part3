@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express()
+const morgan = require('morgan')
 
 let persons = [
     { 
@@ -23,6 +24,9 @@ let persons = [
         "number": "39-23-6423122"
     }
 ]
+
+app.use(express.json())
+app.use(morgan('tiny'))
 
 app.get('/api/persons', (request, response) => {
     response.json(persons)
@@ -51,8 +55,6 @@ app.delete('/api/persons/:id', (request, response) => {
     persons = persons.filter(person => person.id !== id)
     response.status(204).end()
 })
-
-app.use(express.json())
 
 app.post('/api/persons', (request, response) => {
     const body = request.body
