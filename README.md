@@ -1,1 +1,1 @@
-https://fullstackopen-learning-part3.onrender.com/api/persons
+https://fullstackopen-learning-part3.onrender.com/
