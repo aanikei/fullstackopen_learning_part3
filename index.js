@@ -5,7 +5,7 @@ const morgan = require('morgan')
 const cors = require('cors')
 const Person = require('./models/person')
 
-let persons = []
+//let persons = []
 
 app.use(express.static('dist'))
 app.use(cors())
@@ -46,11 +46,14 @@ app.get('/api/persons', (request, response) => {
 })
 
 app.get('/info', (request, response) => {
-    response.send(`
-    <div>Phonebook has info for ${persons.length} people.</div>
-    <br />
-    <div>${new Date().toString()}</div>
-    `)
+    Person
+        .find({}).then(result => {
+            response.send(`
+            <div>Phonebook has info for ${result.length} people.</div>
+            <br />
+            <div>${new Date().toString()}</div>
+            `)
+        })
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
@@ -74,8 +77,6 @@ app.delete('/api/persons/:id', (request, response, next) => {
             response.status(204).end()
         })
         .catch(error => next(error))
-
-    persons = persons.filter(person => person.id !== id)
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
@@ -105,18 +106,16 @@ app.post('/api/persons', (request, response, next) => {
         return response.status(400).json({ 
             error: 'The number is missing' 
         })
-    } else if (persons.filter(x => x.name === body.name).length) {
+    } /*else if (persons.filter(x => x.name === body.name).length) {
         return response.status(400).json({ 
             error: 'The name already exists in the phonebook' 
         })
-    }
+    }*/
   
     const person = new Person({
         name: body.name,
         number: body.number,
     })
-  
-    persons = persons.concat(person)
     
     person.save()
         .then(savedPerson => {
