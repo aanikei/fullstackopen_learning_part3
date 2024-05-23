@@ -29,10 +29,13 @@ app.use(morgan(function (tokens, req, res) {
 }))
 
 const errorHandler = (error, request, response, next) => {
-    console.error(error.message)
+    console.error("errorHandler", error.message)
+    console.error("error.name", error.name)
   
     if (error.name === 'CastError') {
         return response.status(400).send({ error: 'malformatted id' })
+    } else if (error.name === 'ValidationError') {
+        return response.status(400).json({ error: error.message })
     }
   
     next(error)
@@ -88,7 +91,7 @@ app.put('/api/persons/:id', (request, response, next) => {
         number: body.number,
     }
 
-    Person.findByIdAndUpdate(id, person, { new: true })
+    Person.findByIdAndUpdate(id, person, { new: true, runValidators: true })
         .then(updatedPerson => {
             response.json(updatedPerson)
         })
@@ -106,11 +109,7 @@ app.post('/api/persons', (request, response, next) => {
         return response.status(400).json({ 
             error: 'The number is missing' 
         })
-    } /*else if (persons.filter(x => x.name === body.name).length) {
-        return response.status(400).json({ 
-            error: 'The name already exists in the phonebook' 
-        })
-    }*/
+    }
   
     const person = new Person({
         name: body.name,
